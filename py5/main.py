@@ -16,3 +16,5 @@ if __name__ == '__main__':
         print('output!')
         a = a - 1
     print(a)
+    b,c = 1,3
+    print("b=,c=",b,c)
