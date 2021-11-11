@@ -1,4 +1,5 @@
 import random
+import math
 #**********排序10个数
 #**********print(random.randint(1,100))1到100的整数
 #**********print(random.random())0到1的浮点数
@@ -18,7 +19,7 @@ def 选择排序():
                 list[j] = tmp
             j = j+1
         i = i+1
-    print("#1排列后：\n",list)
+    print("#排列后：",list)
 
 
 def 冒泡排序():
@@ -33,7 +34,7 @@ def 冒泡排序():
                 list[j+1] = tmp
             j = j+1
         i = i+1
-    print("#2排列后：\n",list)
+    print("#排列后：",list)
 
 def 插入排序():
     print("排列前：",list)
@@ -45,8 +46,23 @@ def 插入排序():
             list[j+1] = list[j]
             j = j - 1
         list[j+1] = tmp
-    print(list)
+    print("#排列后：",list)
     
+def 希尔排序():
+    print("排列前：",list)
+    pos = 1
+    while( pos < len(list)/3 ):
+        pos = pos*3+1
+    while pos > 0:
+        for i in range(pos ,len(list)):
+            tmp = list[i]
+            j = i-pos
+            while j >= 0 and list[j] > tmp:
+                list[j+pos] = list[j]
+                j -= pos
+            list[j+pos] = tmp
+        pos = math.floor(pos/3)
+    print("#排列后：",list)
     
 if __name__ == '__main__':
     list = [random.randint(1,100), random.randint(1,100), random.randint(1,100),
@@ -55,5 +71,4 @@ if __name__ == '__main__':
             random.randint(1,100)]
     #menu()
     #x = input('输入：')
-
-   
+    
