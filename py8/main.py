@@ -63,12 +63,31 @@ def 希尔排序():
             list[j+pos] = tmp
         pos = math.floor(pos/3)
     print("#排列后：",list)
-    
+
+def 递归排序(list):
+    if(len(list)<2):
+        return list
+    mid = math.floor(len(list)/2)
+    left,right = list[0:mid],list[mid:]
+    return 递归排序操作(递归排序(left),递归排序(right))
+
+def 递归排序操作(left,right):
+    result = []
+    while left and right:
+        if left[0] <= right[0]:
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0));
+    while left:
+        result.append(left.pop(0))
+    while right:
+        result.append(right.pop(0));
+    return result
 if __name__ == '__main__':
     list = [random.randint(1,100), random.randint(1,100), random.randint(1,100),
             random.randint(1,100), random.randint(1,100), random.randint(1,100),
             random.randint(1,100), random.randint(1,100), random.randint(1,100),
             random.randint(1,100)]
-    #menu()
-    #x = input('输入：')
+
+    #print("#排列后：",递归排序(list))
     
