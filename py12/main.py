@@ -1,6 +1,8 @@
 import os
 import sys
 from openpyxl import Workbook
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 ############################
 # github.com/foreverlz1111 #
 ############################
@@ -42,7 +44,7 @@ def get_sysinfo():
 
 
 def get_varinfo():
-    print("当前目录", __current_cwd)
+    print("当前启动目录", __current_cwd)
     create_dir()
 
 def create_dir():
@@ -61,4 +63,19 @@ def create_dir():
 
 if __name__ == "__main__":
     menu()
-    wb = Workbook()
+    wb = load_workbook(filename = "test.xlsx")
+    sheet_ranges = wb["工作表1"]
+    count = 0
+    for x in sheet_ranges['B']:
+        count += 1
+        print(x.value)
+        if count == 10:
+            break
+    print(count)
+    
+    # iter_rows(起始行，计算列数，计算行数)
+    for row in sheet_ranges.iter_rows(min_row = 1,max_col=3,max_row=2):
+        for cell in row:
+            print(cell.value)
+    # print(sheet_ranges["A1"].value)
+   
