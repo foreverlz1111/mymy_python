@@ -6,6 +6,8 @@ from openpyxl.utils import get_column_letter
 ############################
 # github.com/foreverlz1111 #
 ############################
+__author__ = "foreverlz1111"
+__license__ = "GPL3.0"
 
 ########
 # 常量 #
@@ -60,22 +62,15 @@ def create_dir():
         except:
             pass
 
+def start():
+    print("\n","将学生作答放入student文件夹内，按下[回车键]继续:")
+    try :
+        tmp = input()
+        print(tmp)
+    except KeyboardInterrupt:
+        print("退出")
 
 if __name__ == "__main__":
     menu()
-    wb = load_workbook(filename = "test.xlsx")
-    sheet_ranges = wb["工作表1"]
-    count = 0
-    for x in sheet_ranges['B']:
-        count += 1
-        print(x.value)
-        if count == 10:
-            break
-    print(count)
-    
-    # iter_rows(起始行，计算列数，计算行数)
-    for row in sheet_ranges.iter_rows(min_row = 1,max_col=3,max_row=2):
-        for cell in row:
-            print(cell.value)
-    # print(sheet_ranges["A1"].value)
+    start()
    
