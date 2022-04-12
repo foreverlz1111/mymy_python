@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
 
     #sheet_ranges.insert_rows(7) 第七行为新增，即截断前面6行
-    #sheet_ranges.delete_cols(1,2)删除第几列
+    #sheet_ranges.delete_cols(1,2)从第几列开始删除，删除几列
     #sheet_ranges.delete_rows(7) 第七行为删除，后面不会补上
 
 
@@ -62,3 +62,10 @@ if __name__ == "__main__":
     Table must be added using ws.add_table() method to avoid duplicate names.
 Using this method ensures table name is unque through out defined names and all other table name. 
     '''
+    scan = os.scandir()
+    for entry in scan:
+        if entry.is_file() and entry.name.endswith(""):
+            print(entry.name)
+            files_count += 1
+    print(files_count)
+    scan.close()
