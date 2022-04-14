@@ -4,6 +4,7 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 import time
+from datetime import datetime
 ############################
 # github.com/foreverlz1111 #
 ############################
@@ -36,26 +37,45 @@ dic_name = {
     "students_notfound": "没找到花名册文件，请确保其在启动目录并命名为" + files_name["students"],
     "answer_found":__current_cwd + " 目录已找到文件：" + files_name["answer"],
     "students_found":__current_cwd + " 目录已找到文件：" + files_name["students"],
+    "choice_notfound":"没找到对应命令，请重新输入。",
+    "processing":"处理中...",
+    "score_title":["学号","姓名","班级","成绩","题目总分"]
 }
 __menu_name = {
     "menu":"\n选择菜单：\n",
     "choice1":"输入1：重新查找文件",
-    "choice2":"输入2：统计学生分数",
-    "choice3":"输入3：统计未提交作业学生名单 ",
-    "choice_exit":"输入q：退出本程序"
+    "choice2":"输入2：修改学生的作答",
+    "choice3":"输入3：统计未提交作业的学生名单 ",
+    "choice_exit":"输入q：退出本程序",
+    
 }
 
 def print_menu():
     for x in __menu_name:
         print(__menu_name[x])
-
+    print(__borderline)
+    
 def catch_choice(c):
+    # 版本兼容性，暂不升级为match
     if(c == "1"):
+        check_files()
+        print_menu()
         return True
     elif(c == "2"):
+        output_score()
+        print_menu()
         return True
     elif(c == "3"):
         return True
+    elif(c == "4"):
+        return True
+    elif(c == "q"):
+        return False
+    else:
+        print(dic_name["choice_notfound"])
+        print_menu()
+        return True
+    
 def menu():
     print_menu()
     userexit = True
@@ -68,11 +88,73 @@ def menu():
             print(dic_name["keyboard_exit"])
             exit()
 
+def output_score():
+    # do not check file if missing
+    print(dic_name["processing"])
+    answer_sheet1 = load_and_sheet1(files_name["answer"])
+    answer_table = get_table(answer_sheet1)
+    students = load_workbook(filename = files_name["students"])
+    students_sheet1 = students["工作表1"] # 输出的成绩花名册
+    students_table = get_table(students_sheet1)
+    wb = Workbook()
+    ws = wb.active
+    score_total = get_total(answer_table)
+    ws.append(dic_name["score_title"])
+    for x in students_table:
+        try:
+            single = load_workbook(filename = dir_name["students_answer"] +"/"+ str(x[0]) + ".xlsx")
+            single_sheet1 = single["Sheet"]
+            single_table = get_table(single_sheet1)
+        except FileNotFoundError:
+            pass
+        score = 0
+        for a in single_table:
+            for b in answer_table:
+                if a[0]==b[0]:
+                    if a[1] == b[1]:
+                        score += b[2]
+                else:
+                    continue
+        x.append(score)
+        x.append(score_total)
+        ws.append(x)
+    wb.save(dir_name["students_score_out"]+"/"+output_xlsx_name())
+    print(__borderline)
 
+def output_xlsx_name():
+    mytime = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    filename = str(mytime)+".xlsx"
+    return filename
+
+def get_total(t):
+    score = 0
+    for c in t:
+        score += c[2]
+    return score
+    
+def load_and_sheet1(f):
+    wb = load_workbook(filename = f)
+    sheet1 = wb["工作表1"]
+    return sheet1
+    
+def get_table(sheet):
+    cells = []
+    table = []
+    p = False
+    for x in sheet.iter_rows(min_row = 2):
+        cells = []
+        for cell in x:
+            if cell.value is None:
+                break
+            cells.append(cell.value)
+        if cells != []:
+            table.append(cells)
+    return table
+            
 def get_sysinfo():
     if sys.platform.startswith("linux"):
         print(__uname.sysname, __uname.release, __uname.machine)
-        time.sleep(1)
+        # time.sleep(1)
         # os.chdir("/home")
     elif sys.platform.startswith("win32"):
         print("Windows")
@@ -113,7 +195,7 @@ def start():
     try:
         tmp = input()
         # print(tmp)
-        time.sleep(1)
+        # time.sleep(1)
     except KeyboardInterrupt:
         print(dic_name["keyboard_exit"])
         exit()

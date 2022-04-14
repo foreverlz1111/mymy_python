@@ -127,7 +127,7 @@ def test4():
                 wb.save("student/"+str(number)+".xlsx"
 )
 if __name__ == "__main__":
-
+    print("begin!")
             
     
 
