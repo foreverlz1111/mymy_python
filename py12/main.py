@@ -39,7 +39,12 @@ dic_name = {
     "students_found":__current_cwd + " 目录已找到文件：" + files_name["students"],
     "choice_notfound":"没找到对应命令，请重新输入。",
     "processing":"处理中...",
-    "score_title":["学号","姓名","班级","成绩","题目总分"]
+    "score_title":["学号","姓名","班级","成绩","题目总分"],
+    "missing_title":["学号","姓名","班级","未提交"],
+    "yes":"是",
+    "save_error":"处理失败！",
+    "save_success":"处理成功，查看文件 ",
+    "saved_path": __current_cwd + "/" +dir_name["students_score_out"]+"/"
 }
 __menu_name = {
     "menu":"\n选择菜单：\n",
@@ -66,6 +71,8 @@ def catch_choice(c):
         print_menu()
         return True
     elif(c == "3"):
+        output_missing()
+        print_menu()
         return True
     elif(c == "4"):
         return True
@@ -88,8 +95,32 @@ def menu():
             print(dic_name["keyboard_exit"])
             exit()
 
+def output_missing():
+    # only check file if missing
+    print(dic_name["processing"])
+    students = load_workbook(filename = files_name["students"])
+    students_sheet1 = students["工作表1"] # 输出的成绩花名册
+    students_table = get_table(students_sheet1)
+    wb = Workbook()
+    ws = wb.active
+    ws.append(dic_name["missing_title"])
+    for x in students_table:
+        try:
+            p = students_answer_filename(x[0])
+            if not os.path.exists(p):
+                x.append(dic_name["yes"])
+                ws.append(x)
+        except:
+            continue
+    try:
+        wb.save(dir_name["students_score_out"]+"/"+output_xlsx_name("未提交"))
+        print(dic_name["save_success"],dic_name["saved_path"]+output_xlsx_name("未提交"))
+    except OSError:
+        print(dic_name["save_error"])
+    print(__borderline)
+
 def output_score():
-    # do not check file if missing
+    # check file for each
     print(dic_name["processing"])
     answer_sheet1 = load_and_sheet1(files_name["answer"])
     answer_table = get_table(answer_sheet1)
@@ -102,7 +133,7 @@ def output_score():
     ws.append(dic_name["score_title"])
     for x in students_table:
         try:
-            single = load_workbook(filename = dir_name["students_answer"] +"/"+ str(x[0]) + ".xlsx")
+            single = load_workbook(filename = students_answer_filename(x[0]))
             single_sheet1 = single["Sheet"]
             single_table = get_table(single_sheet1)
         except FileNotFoundError:
@@ -118,12 +149,20 @@ def output_score():
         x.append(score)
         x.append(score_total)
         ws.append(x)
-    wb.save(dir_name["students_score_out"]+"/"+output_xlsx_name())
+    try:
+        wb.save(dir_name["students_score_out"]+"/"+output_xlsx_name("成绩"))
+        print(dic_name["save_success"],dic_name["saved_path"]+output_xlsx_name("成绩"))
+    except OSError:
+        print(dic_name["save_error"])
     print(__borderline)
 
-def output_xlsx_name():
+    
+def students_answer_filename(x):
+    return dir_name["students_answer"] +"/"+ str(x) + ".xlsx"
+
+def output_xlsx_name(s):
     mytime = time.strftime("%Y%m%d%H%M%S", time.localtime())
-    filename = str(mytime)+".xlsx"
+    filename = s+str(mytime)+".xlsx"
     return filename
 
 def get_total(t):
