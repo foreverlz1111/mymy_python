@@ -1,10 +1,11 @@
 import os
 import sys
+import time
+from datetime import datetime
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
-import time
-from datetime import datetime
+
 ############################
 # github.com/foreverlz1111 #
 ############################
@@ -46,11 +47,12 @@ dic_name = {
     "save_success":"处理成功，查看文件 ",
     "saved_path": __current_cwd + "/" +dir_name["students_score_out"]+"/"
 }
+
 __menu_name = {
     "menu":"\n选择菜单：\n",
     "choice1":"输入1：重新查找文件",
-    "choice2":"输入2：修改学生的作答",
-    "choice3":"输入3：统计未提交作业的学生名单 ",
+    "choice2":"输入2：输出成绩文件",
+    "choice3":"输入3：输出未提交作业的学生名单文件 ",
     "choice_exit":"输入q：退出本程序",
     
 }

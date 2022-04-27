@@ -2,5 +2,5 @@
 
 ```
 pip3 install pyopenxl
-pip3 install pandas
+
 ```
