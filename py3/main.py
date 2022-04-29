@@ -1,27 +1,68 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import speedtest
+import pprint
 
 
 def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    print(f"Hi, {name}")
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    #print_hi('PyCharm')
-
+def print_bit():
     hour = float(input("hour : "))
     minute = float(input("minute : "))
     bitrate = float(input("bitrate per second / mbps : "))
-    total_flow = (bitrate/8 * (3600*hour + 60*minute))
+    total_flow = bitrate / 8 * (3600 * hour + 60 * minute)
     if total_flow < 1024:
-        print(str(float(bitrate) / 8 * float(3600 * hour + 60 * minute))+"MB")
+        print(str(float(bitrate) / 8 * float(3600 * hour + 60 * minute)) + "MB")
     else:
         total_flow /= 1024
-        print(str(total_flow)+"GB")
+        print(str(total_flow) + "GB")
 
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+def bits_to_mbit(s, b):
+    KB = 1000
+    MB = KB * 1000
+    GB = MB * 1000
+    if b > GB:
+        print(s, "{:.2f}".format(b / GB), "GiB/s")
+    elif b > MB:
+        print(s, "{:.2f}".format(b / MB), "MiB/s")
+    elif b > KB:
+        print(s, "{:.2f}".format(b / KB), "KiB/s")
+
+
+def menu():
+    servers = []
+    threads = None
+    s = speedtest.Speedtest()
+    try:
+        print("获取服务器列表...")
+        s.get_servers(servers)
+    except:
+        pass
+    try:
+        print("获取最佳服务器中...")
+        s.get_best_server()
+        print("最小延迟 {} ms".formar(s.results.ping))
+    except:
+        pass
+    try:
+        print("测试上传中", "...")
+        s.upload(threads=threads)
+        bits_to_mbit("上传速度： ", s.results.upload)
+    except KeyboardInterrupt:
+        print("end")
+    try:
+        print("测试下载中...")
+        s.download(threads=threads)
+        bits_to_mbit("下载速度：", s.results.download)
+    except KeyboardInterrupt:
+        print("end")
+
+    # 所有可选择显示信息
+    # result_dict = s.results.dict()
+    # pprint.pprint(result_dict)
+    # print(s.results.client["ip"])
+
+
+if __name__ == "__main__":
+    menu()
