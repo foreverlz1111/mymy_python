@@ -100,7 +100,7 @@ def test3():
         ws1.append(datas)
         print(datas)
         datas = []
-    wb.save("test3.xlsx")
+    wb.save("answer.xlsx")
 
 def test4():
     #生成学生答案
@@ -124,8 +124,7 @@ def test4():
                 count += 1
                 ws1.append(datas)
                 datas = []
-                wb.save("student/"+str(number)+".xlsx"
-)
+                wb.save("student/"+str(number)+".xlsx")
 if __name__ == "__main__":
     print("begin!")
             

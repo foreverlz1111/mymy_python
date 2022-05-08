@@ -2,6 +2,7 @@ import os
 import sys
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from openpyxl.chart import BarChart
 import time
 import pprint
 
@@ -52,8 +53,10 @@ dic_name = {
     "students_found": __current_cwd + " 目录已找到文件：" + files_name["students"],
     "choice_notfound": "没找到对应命令，请重新输入。",
     "processing": "处理中...",
+    "processing_current_file":"当前文件：{}",
     "score_title": ["学号", "姓名", "班级", "成绩", "题目总分"],
     "missing_title": ["学号", "姓名", "班级", "未提交"],
+    "office_title":["题号", "正确", "总分"],
     "yes": "是",
     "save_error": "处理失败！",
     "save_success": "处理成功，查看文件 ",
@@ -122,36 +125,142 @@ def office_excel():
         for entry in scan:
             if entry.is_file() and entry.name.endswith(".xlsx"):
                 # do
+                filename=(dir_name["students_answer"] + "/" + entry.name)
                 single_dataonly = load_workbook(
-                    filename=(dir_name["students_answer"] + "/" + entry.name),
+                    filename=filename,
                     data_only=True,
-                )
-                single = load_workbook(
-                    filename=(dir_name["students_answer"] + "/" + entry.name)
-                )
+                    )
+                single = load_workbook(filename=filename)
+                single_dataonly_sheet1 = single_dataonly["Sheet1"]
+                single_dataonly_sheet2 = single_dataonly["Sheet2"]
                 single_sheet1 = single["Sheet1"]
                 single_sheet2 = single["Sheet2"]
                 single_sheet3 = single["Sheet3"]
                 single_sheet4 = single["Sheet4"]
+                print(dic_name["processing_current_file"].format(filename))
+                wb = Workbook()
+                ws = wb.active
+                ws.append(dic_name["office_title"])
+                tb = []
+                tmp = []
                 try:
-                    office_excel_q1(single_sheet4)
+                    tmp.clear()
+                    tmp.append(1)
+                    if office_excel_q1(single_sheet4):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
                 except Exception as e:
                     print(e)
                 try:
-                    office_excel_q2(single_sheet4)
+                    tmp.clear()
+                    tmp.append(2)
+                    if office_excel_q2(single_sheet4):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
                 except Exception as e:
                     print(e)
                 try:
-                    office_excel_q3(single_sheet1)
+                    tmp.clear()
+                    tmp.append(3)
+                    if office_excel_q3(single_sheet1):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
                 except Exception as e:
                     print(e)
                 try:
-                    office_excel_q4(single_sheet1)
+                    tmp.clear()
+                    tmp.append(4)
+                    if office_excel_q4(single_sheet1):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
                 except Exception as e:
                     print(e)
-
+                try:
+                    tmp.clear()
+                    tmp.append(5)
+                    if office_excel_q5(single_sheet1):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
+                except Exception as e:
+                    print(e)
+                try:
+                    tmp.clear()
+                    tmp.append(6)
+                    if office_excel_q6(single_dataonly_sheet1,single_sheet1):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
+                except Exception as e:
+                    print(e)
+                try:
+                    tmp *= 0
+                    tmp.append(7)
+                    if office_excel_q7(single_dataonly_sheet2):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
+                except Exception as e:
+                    print(e)
+                try:
+                    tmp *= 0
+                    tmp.append(8)
+                    if office_excel_q8(single_sheet3):
+                        tmp.append("是")
+                        tmp.append(12.5)
+                    else:
+                        tmp.append("否")
+                        tmp.append(0)
+                    ws.append(tmp.copy())
+                    tb.append(tmp.copy())
+                except Exception as e:
+                    print(e)
+                
+                tmp.clear()
+                sum = 0
+                tmp.append("总分")
+                for v in tb:
+                    sum += v[2]
+                tmp.append(sum)
+                ws.append(tmp)
+                try:
+                    wb.save(dir_name["students_score_out"] + "/" + output_xlsx_name(entry.name[:len(entry.name)-5]+"成绩"))
+                    print(dic_name["save_success"], dic_name["saved_path"] + output_xlsx_name(entry.name[:len(entry.name)-5]+"成绩"))
+                except OSError:
+                    print(dic_name["save_error"])   
         scan.close()
-        print("完成！")
         print(__borderline)
 
 
@@ -163,15 +272,15 @@ def office_excel_q1(s):
     verror = "只能录入5位数字或文本"
     verrorstyle = "warning"
     for x in s.data_validations.dataValidation:
-        print(x)
+        # row text by print(x)
         if x.sqref == block:
             if x.type == vtype and x.operator == voperator:
                 if x.errorStyle == verrorstyle:
                     if x.error == verror:
                         print("q1 —— pass")
-                        return
+                        return True
     print("q1 —— error")
-
+    return False
 
 def office_excel_q2(s):
     # get time formula
@@ -180,9 +289,9 @@ def office_excel_q2(s):
     c1 = s[block]
     if c1.value == block_answer:
         print("q2 —— pass")
-        return
+        return True
     print("q2 —— error")
-
+    return False
 
 def office_excel_q3(s):
     # code upgrade formula only
@@ -194,9 +303,9 @@ def office_excel_q3(s):
             x[0].coordinate, str(added_pos), str(added_str)
         ):
             print("q3 —— error")
-            return
+            return False
     print("q3 —— pass")
-
+    return True
 
 def office_excel_q4(s):
     # formulae included below,suggest the first:
@@ -224,7 +333,7 @@ def office_excel_q4(s):
                 break
         if not found:
             print("q4 —— error")
-            return
+            return found
     for x in s.iter_rows(min_row=3, min_col=7, max_col=8):
         found = False
         for f in formulae:
@@ -235,9 +344,146 @@ def office_excel_q4(s):
                 break
         if not found:
             print("q4 —— error")
-            return
+            return found
     print("q4 —— pass")
+    return True
 
+def office_excel_q5(s):
+    block1 = "N3"
+    block1_answer = '=COUNTIF(D$3:D$66,"男")'
+    block2 = "N4"
+    block2_answer = '=COUNTIF(I$3:I$66,"高级工程师")'
+    block3 = "N5"
+    block3_answer = '=COUNTIF(H$3:H$66,">=10")'
+    n3 = s[block1]
+    n4 = s[block2]
+    n5 = s[block3]
+    n = [n3, n4, n5]
+    a = [block1_answer, block2_answer, block3_answer]
+    for x,v in enumerate(n):
+        if not v.value == a[x]:
+            print("q5 —— error")
+            return False
+    print("q5 —— pass")
+    return True
+
+def office_excel_q6(s1,s2):
+    # ""IF"" function only
+    ift = "\"TRUE\""
+    ifn = "\"FALSE\""
+    formula = "=IF(AND({}>20,{}=\"工程师\"),{},{})"
+    for x in s2.iter_rows(min_row=3, min_col=8, max_col=11):
+        if not x[3].value == formula.format(s1.cell(row=x[0].row,column=x[0].column).coordinate,x[1].coordinate,ift,ifn):
+            print("q6 —— error")
+            return Flase
+    print("q6 —— pass")
+    return True
+
+
+def office_excel_q7(s):
+    # check value
+    choices = ["男",30,10,"助工"]
+    for x in s.iter_rows(min_row=3, min_col=4, max_col=9):
+        if not (x[0].value == choices[0] and x[2].value >= choices[1] and  x[4].value >= choices[2] and x[5].value==choices[3]):
+            print("q7 —— error")
+            return False
+    print("q7 —— pass")
+    return True
+    
+def office_excel_q8(s):
+    # chart sheet
+    selected_answer = "职称"
+    x_axis_answer = "职称"
+    y_axis_answer = "职称"
+    p = s._pivots[0]
+    p.cache.refreshOnLoad = True
+    if not s.cell(row=p.location.firstDataRow,column=p.location.firstDataCol).value == selected_answer:
+        print("q8 —— error")
+        return False
+    for t in s._charts:
+        # print("print(t.x_axis.title.body)")
+        # print(t.x_axis.title.body)
+        # print(__borderline)
+        # print("print(t.x_axis.title.extLst)")
+        # print(t.x_axis.title.extLst)
+        # print(__borderline)
+        # print("print(t.x_axis.title.graphicalProperties)")
+        # print(t.x_axis.title.graphicalProperties)
+        # print(__borderline)
+        # print("print(t.x_axis.title.layout)")
+        # print(t.x_axis.title.layout)
+        # print(__borderline)
+        # print("print(t.x_axis.title.overlay)")
+        # print(t.x_axis.title.overlay)
+        # print(__borderline)
+        # print("print(t.x_axis.title.spPr)")
+        # print(t.x_axis.title.spPr)
+        # print(__borderline)
+        if not t.x_axis.title.text.rich.p[0].r[0].t == x_axis_answer:
+            print("q8 —— error")
+            return False
+        if not t.y_axis.title.text.rich.p[0].r[0].t == y_axis_answer:
+            print("q8 —— error")
+            return False
+        # print("print(t.x_axis.title.text)")
+        # print(t.x_axis.title.text)
+        # print(__borderline)
+        # print("print(t.x_axis.title.text.rich.p[0].r[0].t)")
+        # print(t.x_axis.title.text.rich.p[0].r[0].t)
+        # print(__borderline)
+        # print("print(t.x_axis.title.tx)")
+        # print(t.x_axis.title.tx)
+        # print(__borderline)
+        # print("print(t.x_axis.title.txPr")
+        # print(t.x_axis.title.txPr)
+        # print(__borderline)
+        # print(t.y_axis.title)
+        # print(__borderline)
+        # for v in t.ser:
+            # print("print(v.bubbleSize)")
+            # print(v.bubbleSize)
+            # print("print(v.dLbls)")
+            # print(v.dLbls)
+            # print("print(v.cat)")
+            # print(v.cat)
+            # print("print(v.dPt)")
+            # print(v.dPt)
+            # print("print(v.data_points)")
+            # print(v.data_points)
+            # print("print(v.errBars)")
+            # print(v.errBars)
+            # print("print(v.extLst)")
+            # print(v.extLst)
+            # print("v.graphicalPropertie")
+            # print(v.graphicalProperties)
+            # print("print(v.identifiers)")
+            # print(v.identifiers)
+            # print("print(v.idx)")
+            # print(v.idx)
+            # print("print(v.invertIfNegative)")
+            # print(v.invertIfNegative)
+            # print("print(v.labels)")
+            # print(v.labels)
+            # print("print(v.marker)")
+            # print(v.marker)
+            # print("print(v.order)")
+            # print(v.order)
+            # print("print(v.pictureOptions)")
+            # print(v.pictureOptions)
+            # print("print(v.title)")
+            # print(v.title)
+            # print("print(v.spPr)")
+            # print(v.spPr)
+            # print("print(v.trendline)")
+            # print(v.trendline)
+            # print("print(v.tx)")
+            # print(v.tx.strRef)
+            # print("print(v.val)")
+            # print(v.val)
+            # print("print(v.xVal)")
+            # print(v.xVal)
+    print("q8 —— pass")
+    return True
 
 def output_missing():
     # only check file if missing
