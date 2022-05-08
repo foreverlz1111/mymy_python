@@ -375,7 +375,7 @@ def office_excel_q6(s1,s2):
     for x in s2.iter_rows(min_row=3, min_col=8, max_col=11):
         if not x[3].value == formula.format(s1.cell(row=x[0].row,column=x[0].column).coordinate,x[1].coordinate,ift,ifn):
             print("q6 —— error")
-            return Flase
+            return False
     print("q6 —— pass")
     return True
 
